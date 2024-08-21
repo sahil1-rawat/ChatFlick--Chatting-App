@@ -1,0 +1,228 @@
+/* #root {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem;
+  text-align: center;
+}
+  bg-[url('https://example.com/path/to/image.jpg')] bg-cover bg-center
+ */
+
+/* Hide the eye icon in Edge */
+input[type='password']::-ms-reveal {
+  display: none;
+}
+
+.loader {
+  display: block;
+  position: relative;
+  height: 32px;
+  width: 200px;
+  background: #fff;
+  border: 2px solid #fff;
+  color: red;
+  overflow: hidden;
+}
+.loader::before {
+  content: '';
+  background: red;
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 0;
+  height: 100%;
+  animation: loading 10s linear infinite;
+}
+.loader:after {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  text-align: center;
+  font-size: 24px;
+  line-height: 32px;
+  color: rgb(0, 255, 255);
+  mix-blend-mode: difference;
+  animation: percentage 0.5s linear;
+}
+
+@keyframes loading {
+  0% {
+    width: 0;
+  }
+  100% {
+    width: 100%;
+  }
+}
+@keyframes percentage {
+  0% {
+    content: '0%';
+  }
+  5% {
+    content: '5%';
+  }
+  10% {
+    content: '10%';
+  }
+  20% {
+    content: '20%';
+  }
+  30% {
+    content: '30%';
+  }
+  40% {
+    content: '40%';
+  }
+  50% {
+    content: '50%';
+  }
+  60% {
+    content: '60%';
+  }
+  70% {
+    content: '70%';
+  }
+  80% {
+    content: '80%';
+  }
+  90% {
+    content: '90%';
+  }
+  95% {
+    content: '95%';
+  }
+  96% {
+    content: '96%';
+  }
+  97% {
+    content: '97%';
+  }
+  98% {
+    content: '98%';
+  }
+  99% {
+    content: '99%';
+  }
+  100% {
+    content: '100%';
+  }
+}
+
+@keyframes ping {
+  60%,
+  75% {
+    transform: scale(1.5);
+    opacity: 0.7;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+@keyframes ping2 {
+  60%,
+  75% {
+    transform: scale(0.5);
+    opacity: 0.7;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+.logo {
+  animation: ping 10s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+.logos {
+  animation: ping2 10s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+@keyframes pulse {
+  50% {
+    opacity: 0.5;
+  }
+}
+.bg_pulse {
+  animation: pulse 3s cubic-bezier(0.6, 0, 0.8, 1) infinite;
+}
+
+.emoji-picker-container {
+  opacity: 0;
+  transform: translateY(-10px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.emoji-picker-container.open {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* scrollbar.css */
+.scrollbar-thin::-webkit-scrollbar {
+  width: 6px; /* Adjust width as needed */
+}
+
+.scrollbar-thin::-webkit-scrollbar-track {
+  background: #1b1c24; /* Background color of the track */
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background: #2f303b; /* Color of the scrollbar thumb */
+  border-radius: 10px; /* Rounded corners for the scrollbar thumb */
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb:hover {
+  background: #0abde3; /* Color of the scrollbar thumb on hover */
+}
+
+.load {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.load div {
+  width: 12px;
+  height: 12px;
+  margin: 0 6px;
+  border-radius: 50%;
+  background-color: #0984e3;
+  animation: bounce 1.4s infinite ease-in-out;
+}
+
+.load div:nth-child(2) {
+  animation-delay: -0.32s;
+}
+
+.load div:nth-child(3) {
+  animation-delay: -0.16s;
+}
+
+@keyframes bounce {
+  0%,
+  20%,
+  50%,
+  80%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-15px);
+  }
+}
+
+.no-contacts-message {
+  text-align: center;
+  color: #fff;
+  font-size: 1.25rem;
+  margin-top: 20px;
+  font-weight: bold;
+  animation: fadeIn 1s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
