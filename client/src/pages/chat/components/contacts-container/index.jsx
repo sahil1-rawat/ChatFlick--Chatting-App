@@ -3,18 +3,24 @@ import React, { useEffect } from 'react';
 import Logo from '@/assets/logo.png';
 import NewMessage from './components/new-msg';
 import { apiClient } from '@/lib/api-client';
-import { GET__CHAT_CONTACTS_ROUTE } from '@/utils/constants';
+import {
+  GET__CHAT_CONTACTS_ROUTE,
+  GET_USER_GROUP_ROUTE,
+} from '@/utils/constants';
 import ContactList from '@/components/ui/contact-list.jsx';
 import { useAppStore } from '@/store';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@radix-ui/react-tabs';
 import ProfileInfo from './components/profile-info';
 import moment from 'moment';
+import CreateGroup from './components/create-group';
 
 const ContactsContainer = () => {
   const {
-    setDirectMessgesContacts,
-    directMessgesContacts,
+    setDirectMessagesContacts,
+    directMessagesContacts,
     setSelectedChatData,
+    groups,
+    setGroups,
   } = useAppStore();
 
   useEffect(() => {
@@ -23,17 +29,30 @@ const ContactsContainer = () => {
         const res = await apiClient.get(GET__CHAT_CONTACTS_ROUTE, {
           withCredentials: true,
         });
-        console.log(res.data);
 
         if (res.data.contacts) {
-          setDirectMessgesContacts(res.data.contacts);
+          setDirectMessagesContacts(res.data.contacts);
         }
       } catch (error) {
         console.error('Failed to fetch contacts:', error);
       }
     };
+    const getGroups = async () => {
+      try {
+        const res = await apiClient.get(GET_USER_GROUP_ROUTE, {
+          withCredentials: true,
+        });
+        if (res.data.groups) {
+          setGroups(res.data.groups);
+        }
+      } catch (err) {
+        console.log(err);
+        console.error('Failed to fetch groups:', err);
+      }
+    };
     getContacts();
-  }, [setDirectMessgesContacts]);
+    getGroups();
+  }, [setDirectMessagesContacts, setGroups]);
 
   return (
     <div className='relative w-full bg-[#1b1c24] border-r border-[#2f303b] max-w-[90vw] md:max-w-[35vw]  xl:max-w-[20vw] '>
@@ -66,7 +85,7 @@ const ContactsContainer = () => {
             </span>
             <NewMessage />
           </div>
-          <ContactList contacts={directMessgesContacts} />
+          <ContactList contacts={directMessagesContacts} />
         </TabsContent>
         <TabsContent
           value='groups'
@@ -75,9 +94,10 @@ const ContactsContainer = () => {
             <span className='text-lg font-semibold text-[#e0e0e0] tracking-widest'>
               Groups
             </span>
+            <CreateGroup />
           </div>
           {/* Add the groups list here */}
-          {/* <ContactList contacts={directMessgesContacts} /> */}
+          <ContactList contacts={groups} isgroup={true} />
         </TabsContent>
       </Tabs>
       <ProfileInfo />

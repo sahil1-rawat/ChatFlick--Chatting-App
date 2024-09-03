@@ -40,6 +40,7 @@ const setupSocket = (server) => {
 
       // Save message to the database
       const createdMessage = await Message.create(message);
+      console.log(createdMessage);
 
       // Retrieve the saved message with populated sender and recipient details
       const messageData = await Message.findById(createdMessage._id)
@@ -47,12 +48,9 @@ const setupSocket = (server) => {
           'sender',
           'id email firstName lastName fullName image color bio'
         )
-        .populate(
-          'recipient',
-          'id email firstName lastName fullName image color bio'
-        );
+        .populate('recipient', 'id email fullName image color bio');
 
-      console.log('Message data to send:', messageData);
+      // console.log('Message data to send:', messageData);
 
       // Emit the message to the recipient if they are connected
       if (recipientSocketId) {

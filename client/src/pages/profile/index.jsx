@@ -31,11 +31,10 @@ import { MdArrowBack } from 'react-icons/md';
 const Profile = () => {
   const navigate = useNavigate();
   const { userInfo, setUserInfo } = useAppStore();
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
+  const [fullName, setFullName] = useState('');
   const [image, setImage] = useState(null);
   const [initialImage, setInitialImage] = useState(null); // Track initial image state
-  const [bio, setBio] = useState(''); // New state for bio
+  const [bio, setBio] = useState('');
   const [hovered, setHovered] = useState(false);
   const [selectedColor, setSelectedColor] = useState(0);
   const [isChanged, setIsChanged] = useState(false);
@@ -44,10 +43,9 @@ const Profile = () => {
 
   useEffect(() => {
     if (userInfo.profileSetup) {
-      setFirstName(userInfo.firstName);
-      setLastName(userInfo.lastName);
+      setFullName(userInfo.fullName);
       setSelectedColor(userInfo.color);
-      setBio(userInfo.bio || ''); // Initialize bio state
+      setBio(userInfo.bio);
     }
 
     if (userInfo.image) {
@@ -60,25 +58,23 @@ const Profile = () => {
   useEffect(() => {
     const hasChanges = () => {
       return (
-        firstName !== userInfo.firstName ||
-        lastName !== userInfo.lastName ||
+        fullName !== userInfo.fullName ||
         selectedColor !== userInfo.color ||
         image !== initialImage ||
-        bio !== userInfo.bio // Check if bio has changed
+        bio !== userInfo.bio
       );
 
       return false;
     };
     setIsChanged(hasChanges());
-  }, [firstName, lastName, selectedColor, image, userInfo, initialImage, bio]);
+  }, [fullName, selectedColor, image, userInfo, initialImage, bio]);
 
   const validateProfile = () => {
-    if (!firstName && !lastName) {
+    if (!fullName) {
       toast.dismiss();
       toast.error('Your name cannot be empty');
-      if (userInfo.firstName || userInfo.lastName) {
-        setFirstName(userInfo.firstName);
-        setLastName(userInfo.lastName);
+      if (userInfo.fullName) {
+        setFullName(userInfo.fullName);
       }
       return false;
     }
@@ -92,10 +88,9 @@ const Profile = () => {
         const res = await apiClient.post(
           UPDATE_PROFILE_ROUTE,
           {
-            firstName,
-            lastName,
+            fullName,
             color: selectedColor,
-            bio, // Include bio in the API request
+            bio,
           },
           { withCredentials: true }
         );
@@ -139,8 +134,6 @@ const Profile = () => {
           },
         });
 
-        console.log(formData);
-
         if (res.status === 200 && res.data.image) {
           setUserInfo({ ...userInfo, image: res.data.image });
           toast.dismiss();
@@ -178,20 +171,13 @@ const Profile = () => {
     image && window.open(image, '_blank');
   };
 
-  // Handler for bio change with character limit
   const handleBioChange = (e) => {
     const newBio = e.target.value;
 
-    // Allow editing even if it doesn't match the full regex after backspacing
-    if (
-      /^[a-zA-Z!@#\$%\^\&*\)\(+=._-]+(\s?[a-zA-Z!@#\$%\^\&*\)\(+=._-]*)?$/.test(
-        newBio
-      ) ||
-      newBio === ''
-    ) {
-      if (newBio.length <= 139) {
-        setBio(newBio);
-      }
+    if (!newBio.startsWith(' ') && newBio.length <= 140) {
+      setBio(newBio);
+    } else if (newBio.length > 140) {
+      setBio(newBio.slice(0, 140));
     }
 
     const textarea = textareaRef.current;
@@ -202,8 +188,10 @@ const Profile = () => {
   const handleNameChange = (e, setName) => {
     const { value } = e.target;
 
-    if (/^[a-zA-Z]+(\s?[a-zA-Z]*)?$/.test(value) || value === '') {
-      setName(value);
+    if (value.match(/^[A-Za-z]*[A-Za-z ]{0,24}$/)) {
+      if (value.length <= 25 && !value.startsWith(' ')) {
+        setName(value);
+      }
     }
   };
 
@@ -218,12 +206,12 @@ const Profile = () => {
             content='Back'
           />
         </div>
-        <div className='grid grid-cols-2'>
+        <div className='grid grid-cols-1 sm:grid-cols-2 place-items-center gap-5 sm:gap-0 sm:place-items-start'>
           <div
-            className='h-full w-32 md:w-48 md:h-48 relative flex items-center justify-center'
+            className='h-full w-24 sm:w-48 sm:h-48 relative flex items-center justify-center'
             onMouseEnter={() => setHovered(true)}
             onMouseLeave={() => setHovered(false)}>
-            <Avatar className='h-32 w-32 md:w-48 md:h-48 rounded-full overflow-hidden'>
+            <Avatar className='h-24 w-24 sm:w-48 sm:h-48 rounded-full overflow-hidden'>
               {image ? (
                 <AvatarImage
                   src={image}
@@ -231,7 +219,7 @@ const Profile = () => {
                   className='object-fill w-full bg-black'
                 />
               ) : (
-                <div className={` h-32 w-32 md:w-48 md:h-48 }`}>
+                <div className={` h-24 w-24 sm:w-48 sm:h-48 }`}>
                   <FaUserCircle
                     className={`${getColor(selectedColor)} h-full w-full`}
                   />
@@ -241,7 +229,7 @@ const Profile = () => {
             {hovered &&
               (!image ? (
                 <div
-                  className='absolute inset-0 flex items-center justify-center bg-black/50 ring-fuchsia-50 rounded-[50%] max-[768px]:h-32 max-[768px]:w-32 max-[768px]:top-[95px] cursor-pointer '
+                  className='absolute inset-0 flex items-center justify-center bg-black/50 ring-fuchsia-50 rounded-[50%] h-24 w-24 sm:h-48 sm:w-48 cursor-pointer '
                   onClick={handleFileInputClick}>
                   <ToolTips
                     icon={
@@ -254,7 +242,7 @@ const Profile = () => {
                 <Menubar className='p-0 border-none'>
                   <MenubarMenu>
                     <MenubarTrigger className='p-0'>
-                      <div className='absolute inset-0 flex items-center justify-center bg-white/30 ring-fuchsia-50 rounded-[50%] max-[768px]:h-32 max-[768px]:w-32 max-[768px]:top-[95px] cursor-pointer'>
+                      <div className='absolute inset-0 flex items-center justify-center bg-white/30 ring-fuchsia-50 rounded-[50%] h-24 w-24 sm:h-48 sm:w-48  cursor-pointer'>
                         <HiOutlinePencilAlt
                           className='text-2xl text-black'
                           aria-label='edit profile'
@@ -313,20 +301,13 @@ const Profile = () => {
               />
               <input
                 type='text'
-                value={firstName}
-                onChange={(e) => handleNameChange(e, setFirstName)}
+                value={fullName}
+                onChange={(e) => handleNameChange(e, setFullName)}
                 className='bg-[#2c2e3b] border-[1px] border-gray-600 text-white p-2 rounded-md outline-none'
-                placeholder='First Name'
+                placeholder='Full Name'
                 autoComplete='off'
               />
-              <input
-                type='text'
-                value={lastName}
-                onChange={(e) => handleNameChange(e, setLastName)}
-                className='bg-[#2c2e3b] border-[1px] border-gray-600 text-white p-2 rounded-md outline-none'
-                placeholder='Last Name'
-                autoComplete='off'
-              />
+
               <textarea
                 ref={textareaRef}
                 value={bio}
@@ -354,7 +335,7 @@ const Profile = () => {
             </div>
             <Button
               disabled={!isChanged}
-              className={`mt-10 bg-fuchsia-600 rounded-full text-white hover:bg-fuchsia-800 ${
+              className={`mt-5 bg-fuchsia-600 rounded-full text-white hover:bg-fuchsia-800 ${
                 !isChanged
                   ? 'cursor-not-allowed opacity-50 hover:bg-fuchsia-600'
                   : 'cursor-pointer'

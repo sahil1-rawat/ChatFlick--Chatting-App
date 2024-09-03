@@ -21,10 +21,20 @@ export const LOGOUT_ROUTE = `${AUTH_ROUTES}/logout`;
 export const CONTACTS_ROUTES = `api/contacts`;
 
 export const SEARCH_CONTACTS_ROUTE = `${CONTACTS_ROUTES}/search`;
+export const SEARCH_GROUP_CONTACTS_ROUTE = `${CONTACTS_ROUTES}/search-contacts`;
 export const GET__CHAT_CONTACTS_ROUTE = `${CONTACTS_ROUTES}/get-chat-contacts`;
+export const GET__ALL_CONTACTS_ROUTE = `${CONTACTS_ROUTES}/get-all-contacts`;
 
 // GET ALL MESSAGES ROUTES
 export const MESSAGES_ROUTES = `api/messages`;
 
 export const GET_ALL_MESSAGES_ROUTE = `${MESSAGES_ROUTES}/get-messages`;
 export const UPLOAD_FILES_ROUTE = `${MESSAGES_ROUTES}/upload-file`;
+export const UNSEND_MESSAGES_ROUTE = `${MESSAGES_ROUTES}/unsend-messages`;
+
+// Grouo Routes
+export const GROUP_ROUTES = `api/groups`;
+
+export const CREATE_GROUP_ROUTE = `${GROUP_ROUTES}/create-group`;
+export const GET_USER_GROUP_ROUTE = `${GROUP_ROUTES}/get-user-group`;
+export const EDIT_GROUT_INFO_ROUTE = `${GROUP_ROUTES}/edit-group-info`;

@@ -3,16 +3,19 @@ export const createChatSlice = (set, get) => ({
   selectedChatType: undefined, // Type of the selected chat (e.g., direct message, group chat)
   selectedChatData: undefined, // Data related to the selected chat (e.g., chat details)
   selectedChatMessages: [], // Messages for the selected chat, initialized as an empty array
-  directMessgesContacts: [], // Correct spelling for consistency
+  directMessagesContacts: [], // Correct spelling for consistency
   isUploading: false,
   isDownloading: false,
+  isMessageSent: false,
   fileUploadProgress: 0,
   fileDownloadProgress: 0,
+  groups: [],
+  setGroups: (groups) => set({ groups }),
   setIsUploading: (isUploading) => {
     set({ isUploading });
   },
   setIsDownloading: (isDownloading) => set({ isDownloading }),
-
+  setIsMessageSent: (isMessageSent) => set({ isMessageSent }),
   setFileUploadProgress: (fileUploadProgress) => set({ fileUploadProgress }),
   setFileDownloadProgress: (fileDownloadProgress) =>
     set({ fileDownloadProgress }),
@@ -27,9 +30,13 @@ export const createChatSlice = (set, get) => ({
     set({ selectedChatMessages }),
 
   // Function to set direct messages contacts
-  setDirectMessgesContacts: (directMessgesContacts) =>
-    set({ directMessgesContacts }),
-
+  setDirectMessagesContacts: (directMessagesContacts) =>
+    set({ directMessagesContacts }),
+  // Function to add a new group
+  addGroup: (group) => {
+    const groups = get().groups;
+    set({ groups: [group, ...groups] });
+  },
   // Function to reset chat state
   closeChat: () =>
     set({

@@ -12,14 +12,7 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: [true, 'Password is Required'],
   },
-  firstName: {
-    type: String,
-    required: false,
-  },
-  lastName: {
-    type: String,
-    required: false,
-  },
+
   bio: {
     type: String,
     required: false,
@@ -38,6 +31,7 @@ const userSchema = new mongoose.Schema({
   },
   fullName: {
     type: String,
+    required: false,
   },
 });
 

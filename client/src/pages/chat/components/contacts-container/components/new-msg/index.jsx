@@ -9,7 +9,6 @@ import {
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
@@ -93,24 +92,26 @@ const NewMessage = () => {
           <div
             className='relative'
             onClick={() => handleDialogOpenChange(true)}>
-            <BsChatDots className='text-2xl' />
-            <BsPlus className='absolute text-sm text-white -top-1 -right-1 bg-teal-600 rounded-full' />
+            <BsChatDots className='text-2xl text-[#3498db]' />
+            <BsPlus className='absolute text-sm text-white -top-0.5 -right-1 bg-[#3498db] rounded-full' />
           </div>
         }
         content='Start a New Chat'
       />
       <Dialog open={openNewContactModel} onOpenChange={handleDialogOpenChange}>
         <DialogContent
-          className='bg-[#181920] border-none text-white w-[400px] h-[400px] flex flex-col dialog-content'
-          ref={DialogRef}>
+          className='bg-[#f2f2f2] border-none text-black w-[400px] h-[500px] flex flex-col dialog-content'
+          ref={DialogRef}
+          aria-describedby={undefined}>
           <DialogHeader>
-            <DialogTitle>Please select a contact</DialogTitle>
-            <DialogDescription></DialogDescription>
+            <DialogTitle className='text-lg font-semibold'>
+              Select a Contact
+            </DialogTitle>
           </DialogHeader>
-          <div>
+          <div className='relative'>
             <Input
               placeholder='Search Contacts'
-              className='relative rounded-lg p-6 pr-10 bg-[#2c2e3b] border-none'
+              className='rounded-lg p-4 pl-10 bg-white border border-gray-300 shadow-sm'
               value={searchingName}
               onChange={(e) => {
                 searchContacts(e.target.value);
@@ -119,53 +120,49 @@ const NewMessage = () => {
             />
             {searchingName ? (
               <FaTimes
-                className='absolute top-20 text-[#fff]/40 right-10 cursor-pointer'
+                className='absolute top-2 right-2 text-gray-500 cursor-pointer'
                 onClick={clearAll}
                 aria-label='Clear search'
               />
             ) : (
               <FaSearch
-                className='absolute top-20 right-10 text-[#fff]/40 cursor-pointer'
+                className='absolute top-2 right-2 text-gray-500'
                 aria-label='Search'
               />
             )}
           </div>
           {searchedContacts.length > 0 ? (
             <ScrollArea className='flex-1 overflow-y-auto'>
-              <div className='flex flex-col gap-5 p-4'>
+              <div className='flex flex-col p-4'>
                 {searchedContacts.map((contact) => (
                   <div
                     key={contact._id}
-                    className='flex gap-3 items-center cursor-pointer'
+                    className='flex gap-3 items-center p-2 cursor-pointer hover:bg-gray-100 rounded-lg'
                     onClick={() => {
                       selectNewContact(contact);
                     }}>
-                    <div className='w-12 h-12 relative'>
-                      <Avatar className='h-12 w-12 rounded-full overflow-hidden'>
+                    <div className='w-12 h-12'>
+                      <Avatar className='w-12 h-12 rounded-full'>
                         {contact.image ? (
                           <AvatarImage
                             src={`${HOST}/${contact.image}`}
                             alt='profile'
-                            className='object-cover h-12 w-12 rounded-[50%] bg-black'
+                            className='object-cover w-full h-full rounded-full'
                           />
                         ) : (
-                          <div className={`w-full h-full  `}>
-                            <FaUserCircle
-                              className={`${getColor(
-                                contact.color
-                              )} h-full w-full rounded-full`}
-                            />
-                          </div>
+                          <FaUserCircle
+                            className={`${getColor(
+                              contact.color
+                            )} w-full h-full rounded-full`}
+                          />
                         )}
                       </Avatar>
                     </div>
                     <div className='flex flex-col'>
-                      <span>
-                        {contact.fullName
-                          ? `${contact.fullName}`
-                          : contact.email}
+                      <span className='font-medium'>
+                        {contact.fullName ? contact.fullName : contact.email}
                       </span>
-                      <span className='text-xs'>{contact.email}</span>
+                      <span className='text-gray-500'>{contact.email}</span>
                     </div>
                   </div>
                 ))}
@@ -184,10 +181,8 @@ const NewMessage = () => {
                           <div></div>
                         </div>
                         <div className='no-contacts-message'>
-                          Search
                           <span className='text-[#0984e3]'>
-                            {' '}
-                            New Contacts .
+                            Search New Contacts .
                           </span>
                         </div>
                       </>
@@ -197,10 +192,9 @@ const NewMessage = () => {
                     searchingName.length > 0 && (
                       <div className='flex flex-col items-center'>
                         <FaSadTear className='text-4xl text-[#0984e3] logo' />
-                        <div className='no-contacts-message mt-4'>
-                          No{' '}
+                        <div className='no-contacts-message mt-4 text-black'>
                           <span className='text-[#0984e3]'>
-                            Contacts Found.
+                            No Contacts Found.
                           </span>
                         </div>
                       </div>

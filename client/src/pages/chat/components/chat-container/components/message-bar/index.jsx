@@ -6,7 +6,6 @@ import EmojiPicker from 'emoji-picker-react';
 import React, { useEffect, useRef, useState } from 'react';
 import { AiOutlinePaperClip, AiOutlineSend } from 'react-icons/ai';
 import { RiEmojiStickerFill } from 'react-icons/ri';
-import { toast } from 'react-toastify';
 
 const MessageBar = () => {
   const emojiRef = useRef();
@@ -19,6 +18,9 @@ const MessageBar = () => {
     setDirectMessgesContacts,
     setIsUploading,
     setFileUploadProgress,
+    isMessageSent,
+    setIsMessageSent,
+    selectedChatMessages,
   } = useAppStore();
 
   const [message, setMessage] = useState('');
@@ -54,11 +56,10 @@ const MessageBar = () => {
           messageType: 'text',
           fileUrl: undefined,
         });
+        setIsMessageSent(true);
       }
+
       setMessage('');
-      toast.success('Message sent');
-    } else {
-      toast.error('Cannot send an empty message');
     }
   };
 
@@ -117,6 +118,7 @@ const MessageBar = () => {
               messageType: 'file',
               fileUrl: res.data.filePath,
             });
+            setIsMessageSent(true);
           }
         }
       }
@@ -124,6 +126,7 @@ const MessageBar = () => {
       // console.log(file);
     } catch (err) {
       setIsUploading(false);
+      setIsMessageSent(false);
       console.log(err);
     }
   };

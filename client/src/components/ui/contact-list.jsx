@@ -4,7 +4,7 @@ import { HOST } from '@/utils/constants';
 import { Avatar, AvatarImage } from '@radix-ui/react-avatar';
 import moment from 'moment';
 import React from 'react';
-import { FaUserCircle } from 'react-icons/fa';
+import { FaUserCircle, FaUserFriends } from 'react-icons/fa';
 import { toast } from 'react-toastify';
 import {
   ContextMenu,
@@ -67,25 +67,24 @@ const ContactList = ({ contacts = [], isgroup = false }) => {
         sortedContacts.map((contact) => (
           <ContextMenu key={contact._id}>
             <ContextMenuTrigger
-              className={`flex items-center space-x-4 p-3  rounded-lg shadow-lg transition-transform transform hover:scale-[1.02]  cursor-pointer ${
+              className={`flex items-center space-x-4 px-4  rounded-lg shadow-lg transition-transform transform hover:scale-[1.02]  cursor-pointer ${
                 selectedChatData && selectedChatData._id === contact._id
                   ? 'bg-[#0abde355] hover:bg-[#0abde344]'
                   : 'bg-[#2f303b] hover:bg-[#393a48]'
-              }`}
+              } `}
               onClick={() => handleClick(contact)}>
-              <div
-                className={`flex items-center space-x-4 w-full transition-transform transform  rounded-lg cursor-pointer`}>
+              <div className='flex items-center w-full '>
                 <div className='relative'>
-                  {!isgroup && (
-                    <Avatar className='w-12 h-12 rounded-full overflow-hidden'>
+                  {!isgroup ? (
+                    <Avatar className='w-16 h-16 rounded-full overflow-hidden flex items-center'>
                       {contact.image ? (
                         <AvatarImage
                           src={`${HOST}/${contact.image}`}
                           alt='profile'
-                          className='object-cover w-10 h-10 rounded-full'
+                          className='object-cover w-12 h-12 rounded-full bg-black'
                         />
                       ) : (
-                        <div className={` w-10 h-10`}>
+                        <div className={` w-12 h-12`}>
                           <FaUserCircle
                             className={`${getColor(
                               contact.color
@@ -94,33 +93,42 @@ const ContactList = ({ contacts = [], isgroup = false }) => {
                         </div>
                       )}
                       {onlineStatuses[contact._id] === true && (
-                        <span className='absolute top-2 left-[34px] inline-block w-2 h-2 bg-green-500 rounded-full'></span>
+                        <span className='absolute top-4 left-[41px] inline-block w-2 h-2 bg-green-500 rounded-full border-green-400'></span>
                       )}
                     </Avatar>
-                  )}
-                  {isgroup && (
-                    <div className='bg-[#ffffff22] h-14 w-14 flex items-center justify-center rounded-full text-xl'>
-                      #
-                    </div>
+                  ) : (
+                    <Avatar className='w-16 h-16 rounded-full overflow-hidden flex items-center'>
+                      <div className={` w-12 h-12`}>
+                        <FaUserFriends
+                          className={`h-12 w-12 rounded-full bg-[#aaa6d0] text-black/50 border-[1px] border-[#bbb7e4]`}
+                        />
+                      </div>
+                    </Avatar>
                   )}
                 </div>
-                <div className='flex-1'>
-                  <span className='text-[13px] font-medium font-serif text-[#e0e0e0] line-clamp-1'>
-                    {isgroup ? contact.name : contact.fullName || contact.email}
-                  </span>
+                <div
+                  className={`flex flex-col  w-full  transition-transform transform  rounded-lg cursor-pointer`}>
+                  <div className='flex  mr-1'>
+                    <div className='flex-1'>
+                      <span className='text-[13px] font-medium font-serif text-[#e0e0e0] line-clamp-1 '>
+                        {isgroup
+                          ? contact.name
+                          : contact.fullName || contact.email}
+                      </span>
+                    </div>
+                    {contact.lastMessageTime && (
+                      <div className='text-[11px] text-gray-400'>
+                        {formatLastMessageTime(contact.lastMessageTime)}
+                      </div>
+                    )}
+                  </div>
+
                   {contact.messageType === 'text' && (
-                    <span
-                      className='text-left text-[12px] line-clamp-1 
-            '>
+                    <span className=' text-[12px] line-clamp-1'>
                       {contact.lastMessage || ''}
                     </span>
                   )}
                 </div>
-                {contact.lastMessageTime && (
-                  <div className='text-[11px] text-gray-400'>
-                    {formatLastMessageTime(contact.lastMessageTime)}
-                  </div>
-                )}
               </div>
             </ContextMenuTrigger>
             <ContextMenuContent className='w-56 bg-[#1f1f2b] text-[#e0e0e0] rounded-lg shadow-lg'>
@@ -184,7 +192,9 @@ const ContactList = ({ contacts = [], isgroup = false }) => {
           </ContextMenu>
         ))
       ) : (
-        <p className='text-center text-gray-500'>No contacts available</p>
+        <p className='text-center text-gray-500'>
+          {isgroup ? 'No Groups' : 'No contacts available'}
+        </p>
       )}
     </div>
   );

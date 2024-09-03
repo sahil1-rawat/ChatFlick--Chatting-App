@@ -11,12 +11,10 @@ export const getUserInfo = async (req, res, next) => {
       id: userData.id,
       email: userData.email,
       profileSetup: userData.profileSetup,
-      firstName: userData.firstName,
-      lastName: userData.lastName,
+      fullName: userData.fullName,
       bio: userData.bio,
       image: userData.image,
       color: userData.color,
-      fullName: userData.fullName,
     });
   } catch (err) {
     console.log(err.message);

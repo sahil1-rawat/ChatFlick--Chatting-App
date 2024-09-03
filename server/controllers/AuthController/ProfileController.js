@@ -7,16 +7,14 @@ export const updateProfile = async (req, res, next) => {
   try {
     // console.log(req.userId);
     const { userId } = req;
-    const { firstName, lastName, color, bio } = req.body;
-    if (!firstName && !lastName) {
+    const { fullName, color, bio } = req.body;
+    if (!fullName) {
       return res.status(404).send('Your name cannot be empty');
     }
-    let fullName = `${firstName} ${lastName}`;
+
     const userData = await User.findByIdAndUpdate(
       userId,
       {
-        firstName,
-        lastName,
         color,
         bio,
         fullName,
@@ -28,12 +26,10 @@ export const updateProfile = async (req, res, next) => {
       id: userData.id,
       email: userData.email,
       profileSetup: userData.profileSetup,
-      firstName: userData.firstName,
-      lastName: userData.lastName,
+      fullName: userData.fullName,
       bio: userData.bio,
       image: userData.image,
       color: userData.color,
-      fullName: userData.fullName,
     });
   } catch (err) {
     console.log(err.message);
@@ -89,6 +85,7 @@ export const removeProfileImage = async (req, res, next) => {
     if (!user) {
       return res.status(404).findById(userId);
     }
+
     if (user.image) {
       unlinkSync(user.image);
       rmdirSync(fileDir);

@@ -18,12 +18,7 @@ export const SearchContacts = async (req, res, next) => {
       $and: [
         { _id: { $ne: req.userId } },
         {
-          $or: [
-            { firstName: regex },
-            { lastName: regex },
-            { email: regex },
-            { fullName: regex },
-          ],
+          $or: [{ email: regex }, { fullName: regex }],
         },
       ],
     });
@@ -89,8 +84,6 @@ export const getChatContactsList = async (req, res, next) => {
           _id: 1, // Contact's ID
           lastMessageTime: 1, // Timestamp of the last message
           email: '$contactInfo.email', // Contact's email
-          firstName: '$contactInfo.firstName', // Contact's first name
-          lastName: '$contactInfo.lastName', // Contact's last name
           fullName: '$contactInfo.fullName', // Contact's full name
           image: '$contactInfo.image', // Contact's profile image
           color: '$contactInfo.color', // Contact's assigned color
@@ -109,6 +102,57 @@ export const getChatContactsList = async (req, res, next) => {
     return res.status(200).json({ contacts });
   } catch (err) {
     // If an error occurs, log the error message and return a 500 status (Internal Server Error)
+    console.log(err.message);
+    return res.status(500).send('Internal Server Error!');
+  }
+};
+
+export const getAllContacts = async (req, res, next) => {
+  try {
+    const users = await User.find(
+      { _id: { $ne: req.userId } },
+      'fullName _id email'
+    );
+
+    const contacts = users.map((user) => ({
+      label: user.fullName ? user.fullName : user.email,
+      value: user._id,
+    }));
+
+    return res.status(200).json({ contacts });
+  } catch (err) {
+    console.log(err.message);
+    return res.status(500).send('Internal Server Error!');
+  }
+};
+
+export const SearchGroupContacts = async (req, res, next) => {
+  try {
+    const { searchTerm } = req.body;
+    if (searchTerm === undefined || searchTerm === null) {
+      return res.status(400).json({ msg: 'Search Term is required' });
+    }
+    const sanitizedSearchTerm = searchTerm.replace(
+      /[.*+?^${}()|[\]\\]/g,
+      '\\$&'
+    );
+    const regex = new RegExp(sanitizedSearchTerm, 'i');
+
+    const contacts = await User.find({
+      $and: [
+        { _id: { $ne: req.userId } },
+        {
+          $or: [{ fullName: regex }],
+        },
+      ],
+    });
+    const Groupcontacts = contacts.map((user) => ({
+      label: user.fullName,
+      value: user._id,
+    }));
+
+    return res.status(200).json({ Groupcontacts });
+  } catch (err) {
     console.log(err.message);
     return res.status(500).send('Internal Server Error!');
   }

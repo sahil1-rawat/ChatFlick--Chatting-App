@@ -10,7 +10,6 @@ import { apiClient } from './lib/api-client';
 import { GET_USER_INFO } from './utils/constants';
 import './App.css';
 import ForgotPassword from './pages/auth/ForgotPassword.jsx';
-import ResetPassword from './pages/auth/ResetPassword';
 
 const PrivateRoute = ({ children }) => {
   const { userInfo } = useAppStore();

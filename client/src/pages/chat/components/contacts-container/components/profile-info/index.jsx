@@ -13,7 +13,15 @@ import { toast } from 'react-toastify';
 import { FaUserCircle } from 'react-icons/fa';
 
 const ProfileInfo = () => {
-  const { userInfo, setUserInfo, setSelectedChatData } = useAppStore();
+  const {
+    userInfo,
+    setUserInfo,
+    setSelectedChatData,
+    setSelectedChatType,
+    setSelectedChatMessages,
+    setGroups,
+    setDirectMessagesContacts,
+  } = useAppStore();
   const navigate = useNavigate();
   const logOut = async () => {
     try {
@@ -24,7 +32,12 @@ const ProfileInfo = () => {
       );
       if (res.status === 200) {
         navigate('/auth');
-        setUserInfo(null);
+        setUserInfo(undefined);
+        setSelectedChatData(undefined);
+        setSelectedChatType(undefined);
+        setSelectedChatMessages([]);
+        setGroups([]);
+        setDirectMessagesContacts([]);
 
         toast.success('Goodbye for now!');
       }
@@ -36,12 +49,12 @@ const ProfileInfo = () => {
     <div className='absolute bottom-0 h-16 flex items-center justify-between px-10 w-full bg-[#2a2b33]'>
       <div className='flex gap-3 items-center justify-center'>
         <div className='w-12 h-12 relative'>
-          <Avatar className='h-12 w-12 rounded-full overflow-hidden'>
+          <Avatar className='h-12 w-12 rounded-full overflow-hidden flex'>
             {userInfo.image ? (
               <AvatarImage
                 src={`${HOST}/${userInfo.image}`}
                 alt='profile'
-                className='object-fill h-12 w-12 rounded-[50%] bg-black'
+                className='object-fill h-11 w-11  rounded-full bg-black'
               />
             ) : (
               <div className={`h-12 w-12 `}>
@@ -54,10 +67,8 @@ const ProfileInfo = () => {
             )}
           </Avatar>
         </div>
-        <div className='text-sm lg:text-md font-serif font-semibold line-clamp-2'>
-          {userInfo.firstName || userInfo.lastName
-            ? `${userInfo.firstName} ${userInfo.lastName}`
-            : ''}
+        <div className='text-[13px] lg:text-md font-serif font-semibold line-clamp-2'>
+          {userInfo.fullName ? `${userInfo.fullName}` : ''}
         </div>
       </div>
       <div className='flex gap-5 '>
