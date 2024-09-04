@@ -1,4 +1,5 @@
 import Message from '../../models/MessagesModel.js';
+import Group from '../../models/GroupModel.js';
 import { mkdirSync, renameSync, rmdirSync, unlinkSync } from 'fs';
 import path from 'path';
 export const getMessages = async (req, res, next) => {
@@ -25,8 +26,6 @@ export const getMessages = async (req, res, next) => {
 
 export const uploadFile = async (req, res, next) => {
   try {
-    console.log(req.file);
-
     if (!req.file) {
       return res.status(400).send('No file uploaded');
     }
@@ -35,7 +34,8 @@ export const uploadFile = async (req, res, next) => {
     let fileName = `${fileDir}/${req.file.originalname}`;
     mkdirSync(fileDir, { recursive: true });
     renameSync(req.file.path, fileName);
-    return res.status(200).json({ filePath: fileName });
+
+    return res.status(200).json({ filePath: fileName, size: req.file.size });
   } catch (err) {
     console.log(err);
     return res.status(500).send('Internal Server Error!');

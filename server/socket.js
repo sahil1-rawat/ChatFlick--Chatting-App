@@ -1,5 +1,6 @@
 import { Server as SocketIOServer } from 'socket.io'; // Import Socket.IO server
 import Message from './models/MessagesModel.js'; // Import message model for database interactions
+import Group from './models/GroupModel.js'; // Import group model for database interactions
 
 const setupSocket = (server) => {
   // Initialize Socket.IO server with CORS settings
@@ -44,10 +45,7 @@ const setupSocket = (server) => {
 
       // Retrieve the saved message with populated sender and recipient details
       const messageData = await Message.findById(createdMessage._id)
-        .populate(
-          'sender',
-          'id email firstName lastName fullName image color bio'
-        )
+        .populate('sender', 'id email fullName image color bio')
         .populate('recipient', 'id email fullName image color bio');
 
       // console.log('Message data to send:', messageData);
@@ -65,6 +63,37 @@ const setupSocket = (server) => {
     }
   };
 
+  const sendGroupMessage = async (message) => {
+    try {
+      const { groupId, sender, content, messageType, fileUrl } = message;
+      const createdMessage = await Message.create({
+        sender,
+        recipient: null,
+        content,
+        messageType,
+        fileUrl,
+        timestamp: new Date(),
+      });
+      const messageData = await Message.findById(createdMessage._id)
+        .populate('sender', 'id email fullName bio image color')
+        .exec();
+      await Group.findByIdAndUpdate(groupId, {
+        $push: { messages: createdMessage._id },
+      });
+      const group = await Group.findById(groupId).populate('members');
+      const finalData = { ...messageData._doc, groupId: group._id };
+      if (group && group.members) {
+        group.members.forEach((member) => {
+          const memberSocketId = userSocketMap.get(member._id.toString());
+          if (memberSocketId) {
+            io.to(memberSocketId).emit('receive-group-message', finalData);
+          }
+        });
+      }
+    } catch (error) {
+      console.log('Error:', error);
+    }
+  };
   // Set up Socket.IO event handlers
   io.on('connection', (socket) => {
     const userId = socket.handshake.query.userId; // Get user ID from socket handshake query
@@ -89,6 +118,7 @@ const setupSocket = (server) => {
 
     // Listen for 'sendMessage' events and handle them with sendMessage function
     socket.on('sendMessage', sendMessage);
+    socket.on('send-group-message', sendGroupMessage);
 
     // Listen for 'getSocketIds' events and handle them with getSocketIds function
 

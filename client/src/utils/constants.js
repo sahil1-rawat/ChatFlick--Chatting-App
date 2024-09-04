@@ -37,4 +37,5 @@ export const GROUP_ROUTES = `api/groups`;
 
 export const CREATE_GROUP_ROUTE = `${GROUP_ROUTES}/create-group`;
 export const GET_USER_GROUP_ROUTE = `${GROUP_ROUTES}/get-user-group`;
+export const GET_GROUP_MESSAGES_ROUTE = `${GROUP_ROUTES}/get-group-messages`;
 export const EDIT_GROUT_INFO_ROUTE = `${GROUP_ROUTES}/edit-group-info`;

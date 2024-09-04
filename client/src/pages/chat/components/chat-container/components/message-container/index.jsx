@@ -3,19 +3,32 @@ import { apiClient } from '@/lib/api-client';
 import { useAppStore } from '@/store';
 import {
   GET_ALL_MESSAGES_ROUTE,
+  GET_GROUP_MESSAGES_ROUTE,
   HOST,
   UNSEND_MESSAGES_ROUTE,
 } from '@/utils/constants';
 import moment from 'moment';
 import { AiOutlineDownload } from 'react-icons/ai';
 import { IoCloseSharp } from 'react-icons/io5';
-import { MdCopyAll, MdDelete, MdSaveAs, MdUndo } from 'react-icons/md';
+import {
+  MdCopyAll,
+  MdDelete,
+  MdFolderZip,
+  MdOutlineFolderZip,
+  MdSaveAs,
+  MdUndo,
+} from 'react-icons/md';
 import { toast } from 'react-toastify';
 import {
   FaFile,
   FaFileAlt,
+  FaFileExcel,
+  FaFilePdf,
+  FaFileWord,
+  FaMusic,
   FaPause,
   FaPlay,
+  FaUserCircle,
   FaVolumeMute,
   FaVolumeOff,
   FaVolumeUp,
@@ -27,6 +40,8 @@ import {
   ContextMenuTrigger,
 } from '@/components/ui/context-menu';
 import { color } from 'framer-motion';
+import { Avatar, AvatarImage } from '@radix-ui/react-avatar';
+import { getColor } from '@/lib/utils';
 
 const MessageContainer = () => {
   const scrollRef = useRef(null);
@@ -40,6 +55,7 @@ const MessageContainer = () => {
     directMessagesContacts,
     setIsMessageSent,
     isMessageSent,
+    userInfo,
   } = useAppStore();
   const videoRef = useRef(null);
   const [showImage, setShowImage] = useState(false);
@@ -165,9 +181,28 @@ const MessageContainer = () => {
         console.error('Failed to fetch messages:', err);
       }
     };
+    console.log(selectedChatData);
 
-    if (selectedChatData._id && selectedChatType === 'contact') {
-      fetchMessages();
+    const fetchGroupMessages = async () => {
+      try {
+        const res = await apiClient.get(
+          `${GET_GROUP_MESSAGES_ROUTE}/${selectedChatData._id}`,
+          { withCredentials: true }
+        );
+
+        if (res.data.messages) {
+          setSelectedChatMessages(res.data.messages);
+        }
+      } catch (err) {
+        console.error('Failed to fetch messages:', err);
+      }
+    };
+    if (selectedChatData._id) {
+      if (selectedChatType === 'contact') {
+        fetchMessages();
+      } else if (selectedChatType === 'group') {
+        fetchGroupMessages();
+      }
     }
   }, [selectedChatData, selectedChatType, setSelectedChatMessages]);
 
@@ -219,6 +254,7 @@ const MessageContainer = () => {
             </div>
           )}
           {selectedChatType === 'contact' && renderDMMessages(message)}
+          {selectedChatType === 'group' && renderGroupMessages(message)}
         </div>
       );
     });
@@ -269,6 +305,30 @@ const MessageContainer = () => {
       setIsMuted(!isMuted);
     }
   };
+  function getFileTypeIcon(fileUrl) {
+    const extension = fileUrl.split('.').pop().toLowerCase();
+    switch (extension) {
+      case 'pdf':
+        return <FaFilePdf />;
+      case 'doc':
+      case 'docx':
+        return <FaFileWord />;
+      case 'xls':
+      case 'xlsx':
+        return <FaFileExcel />;
+      case 'zip':
+        return <MdFolderZip />;
+
+      default:
+        return <FaFile />;
+    }
+  }
+  function getFileSize(fileUrl) {
+    return '2.5 MB';
+  }
+  function getFileExtension(fileUrl) {
+    return fileUrl.split('.').pop().toUpperCase();
+  }
 
   const handleProgressClick = (e) => {
     const videoElement = videoRef.current;
@@ -361,16 +421,13 @@ const MessageContainer = () => {
                   <>
                     {checkIfVideo(message.fileUrl) ? (
                       <div
-                        className='cursor-pointer relative'
+                        className='cursor-pointer relative max-h-[60%]'
                         onClick={() => {
                           setShowVideo(true);
                           setIsPlaying(true);
                           setVideoUrl(message.fileUrl);
                         }}>
-                        <video
-                          height='250'
-                          width='250'
-                          className='object-cover'>
+                        <video width='250' className='object-cover h-[350px]'>
                           <source
                             src={`${HOST}/${message.fileUrl}`}
                             type={`video/${message.fileUrl
@@ -439,6 +496,177 @@ const MessageContainer = () => {
     );
   };
 
+  const renderGroupMessages = (message) => {
+    const isSentMessage = message.sender._id === userInfo.id;
+
+    const handleCopy = async () => {
+      copyToClipboard(message.content);
+    };
+    return (
+      <div
+        className={`container mb-2 relative   ${
+          isSentMessage ? 'text-right' : 'text-left'
+        }`}>
+        <ContextMenu>
+          <ContextMenuTrigger>
+            {message.messageType === 'text' && (
+              <>
+                <div
+                  className={`inline-block py-3 px-4 my-2 max-w-[70%] break-words text-left ${
+                    isSentMessage
+                      ? 'bg-teal-500 text-white border border-teal-600 rounded-br-xl'
+                      : 'bg-yellow-100 text-gray-900 border border-yellow-300 rounded-bl-xl'
+                  } relative`}>
+                  {isValidURL(message.content) ? (
+                    <a
+                      href={message.content}
+                      target='_blank'
+                      rel='noopener noreferrer'
+                      className=' hover:underline '>
+                      {message.content}
+                    </a>
+                  ) : (
+                    <div>{message.content}</div>
+                  )}
+                </div>
+              </>
+            )}
+            {message.messageType === 'file' && (
+              <div
+                className={`inline-block  rounded-lg my-1  break-words ${
+                  isSentMessage
+                    ? 'bg-transparent text-white'
+                    : 'bg-transparent text-white'
+                } ${
+                  checkIfImage(message.fileUrl)
+                    ? 'max-w-[70%]'
+                    : 'max-w-[80%] lg:max-w-[60%] xl:max-w-[40%]'
+                }`}>
+                {checkIfImage(message.fileUrl) ? (
+                  <div
+                    className='cursor-pointer'
+                    onClick={() => {
+                      setShowImage(true);
+                      setImageUrl(message.fileUrl);
+                    }}>
+                    <img
+                      src={`${HOST}/${message.fileUrl}`}
+                      alt=''
+                      height={300}
+                      width={300}
+                    />
+                  </div>
+                ) : (
+                  <>
+                    {checkIfVideo(message.fileUrl) ? (
+                      <div
+                        className='cursor-pointer relative max-h-[60%]'
+                        onClick={() => {
+                          setShowVideo(true);
+                          setIsPlaying(true);
+                          setVideoUrl(message.fileUrl);
+                        }}>
+                        <video width='400' className='object-cover h-[250px]'>
+                          <source
+                            src={`${HOST}/${message.fileUrl}`}
+                            type={`video/${message.fileUrl
+                              .split('.')
+                              .pop()
+                              .toLowerCase()}`}
+                          />
+                        </video>
+                        <FaPlay className='absolute top-[50%] left-[50%]' />
+                      </div>
+                    ) : (
+                      <div
+                        className={`flex items-center gap-2 border p-4 text-left ${
+                          isSentMessage
+                            ? 'bg-teal-500 text-white border border-teal-600 rounded-br-xl'
+                            : 'bg-yellow-100 text-gray-900 border border-yellow-300 rounded-bl-xl'
+                        } `}>
+                        <span className='text-white text-3xl bg-black/20 rounded-full p-3'>
+                          {getFileTypeIcon(message.fileUrl)}
+                        </span>
+                        <div>
+                          <span className='line-clamp-1'>
+                            {message.fileUrl.split('/').pop()}
+                          </span>
+                        </div>
+                        <span
+                          className='bg-black/20 p-3 text-2xl rounded-full hover:bg-black/50 cursor-pointer transition-all duration-300'
+                          onClick={() => downloadFile(message.fileUrl)}>
+                          <AiOutlineDownload />
+                        </span>
+                      </div>
+                    )}
+                  </>
+                )}
+              </div>
+            )}
+            {isSentMessage ? (
+              <div
+                className={`text-xs ${
+                  isSentMessage ? 'text-[#7FA1C3]' : 'text-[#636e72]'
+                } mt-1`}>
+                {moment(message.timestamp).format('LT')}
+              </div>
+            ) : (
+              <div className='flex items-center justify-start gap-3'>
+                <Avatar className='h-8 w-8 rounded-full overflow-hidden '>
+                  {message.sender.image ? (
+                    <AvatarImage
+                      src={`${HOST}/${message.sender.image}`}
+                      alt='profile'
+                      className='object-fill h-8 w-8  rounded-full bg-black'
+                    />
+                  ) : (
+                    <div className={`h-8 w-8 `}>
+                      <FaUserCircle
+                        className={`${getColor(
+                          message.sender.color
+                        )} h-full w-full rounded-full`}
+                      />
+                    </div>
+                  )}
+                </Avatar>
+                <div className='text-xs text-gray-500'>
+                  {message.sender.fullName.split(' ').shift()}
+                </div>
+                <div
+                  className={`text-xs ${
+                    isSentMessage ? 'text-[#7FA1C3]' : 'text-[#636e72]'
+                  } mt-1`}>
+                  {moment(message.timestamp).format('LT')}
+                </div>
+              </div>
+            )}
+          </ContextMenuTrigger>
+          <ContextMenuContent className='w-48'>
+            <ContextMenuItem>
+              <MdUndo className='text-xl' />
+              <span>Unsend</span>
+            </ContextMenuItem>
+            <ContextMenuItem>
+              <MdDelete className='text-xl' />
+              Delete
+            </ContextMenuItem>
+
+            {message.messageType === 'file' ? (
+              <ContextMenuItem onClick={() => downloadFile(message.fileUrl)}>
+                <MdSaveAs className='text-xl' />
+                Save As
+              </ContextMenuItem>
+            ) : (
+              <ContextMenuItem onClick={handleCopy}>
+                <MdCopyAll className='text-xl' />
+                Copy
+              </ContextMenuItem>
+            )}
+          </ContextMenuContent>
+        </ContextMenu>
+      </div>
+    );
+  };
   return (
     <div className='flex flex-col flex-1 overflow-y-auto p-4 px-8 md:w-[65vw] lg:w-[70vw] xl:w-[80vw] w-full scrollbar-hide scrollbar-thin '>
       {renderMessages()}

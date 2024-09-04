@@ -57,6 +57,14 @@ const MessageBar = () => {
           fileUrl: undefined,
         });
         setIsMessageSent(true);
+      } else if (selectedChatType === 'group') {
+        socket.emit('send-group-message', {
+          sender: userInfo.id,
+          content: message,
+          messageType: 'text',
+          fileUrl: undefined,
+          groupId: selectedChatData._id,
+        });
       }
 
       setMessage('');
@@ -117,6 +125,15 @@ const MessageBar = () => {
               recipient: selectedChatData._id,
               messageType: 'file',
               fileUrl: res.data.filePath,
+            });
+            setIsMessageSent(true);
+          } else if (selectedChatType === 'group') {
+            socket.emit('send-group-message', {
+              sender: userInfo.id,
+              content: undefined,
+              messageType: 'file',
+              fileUrl: res.data.filePath,
+              groupId: selectedChatData._id,
             });
             setIsMessageSent(true);
           }

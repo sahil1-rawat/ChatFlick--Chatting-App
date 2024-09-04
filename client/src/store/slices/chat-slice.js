@@ -86,4 +86,14 @@ export const createChatSlice = (set, get) => ({
       },
     }));
   },
+
+  addGroupInGroupList: (message) => {
+    const groups = get().groups;
+    const data = groups.find((group) => group._id === message.groupId);
+    const index = groups.findIndex((group) => group._id === message.groupId);
+    if (index !== -1 && index !== undefined) {
+      groups.splice(index, 1);
+      groups.unshift(data);
+    }
+  },
 });

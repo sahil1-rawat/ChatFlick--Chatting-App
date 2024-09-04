@@ -48,25 +48,23 @@ const ProfileInfo = () => {
   return (
     <div className='absolute bottom-0 h-16 flex items-center justify-between px-10 w-full bg-[#2a2b33]'>
       <div className='flex gap-3 items-center justify-center'>
-        <div className='w-12 h-12 relative'>
-          <Avatar className='h-12 w-12 rounded-full overflow-hidden flex'>
-            {userInfo.image ? (
-              <AvatarImage
-                src={`${HOST}/${userInfo.image}`}
-                alt='profile'
-                className='object-fill h-11 w-11  rounded-full bg-black'
+        <Avatar className='w-16 h-16 rounded-full overflow-hidden flex items-center'>
+          {userInfo.image ? (
+            <AvatarImage
+              src={`${HOST}/${userInfo.image}`}
+              alt='profile'
+              className='object-cover w-10 h-10 rounded-full bg-black'
+            />
+          ) : (
+            <div className={` w-10 h-10`}>
+              <FaUserCircle
+                className={`${getColor(
+                  userInfo.color
+                )} h-full w-full rounded-full`}
               />
-            ) : (
-              <div className={`h-12 w-12 `}>
-                <FaUserCircle
-                  className={`${getColor(
-                    userInfo.color
-                  )} h-full w-full rounded-full`}
-                />
-              </div>
-            )}
-          </Avatar>
-        </div>
+            </div>
+          )}
+        </Avatar>
         <div className='text-[13px] lg:text-md font-serif font-semibold line-clamp-2'>
           {userInfo.fullName ? `${userInfo.fullName}` : ''}
         </div>

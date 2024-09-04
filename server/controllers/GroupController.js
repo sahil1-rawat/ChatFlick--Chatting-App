@@ -70,6 +70,29 @@ export const getUserGroup = async (req, res, next) => {
     return res.status(500).send('Internal Server Error!');
   }
 };
+export const getGroupMessages = async (req, res, next) => {
+  try {
+    const { groupId } = req.params;
+    const group = await Group.findById(groupId).populate({
+      path: 'messages',
+      populate: {
+        path: 'sender',
+        select: 'fullName email _id image color bio',
+      },
+    });
+
+    if (!group) {
+      return res.status(404).send('Group not found!');
+    }
+    const messages = group.messages;
+    console.log(messages);
+
+    return res.status(201).json({ messages });
+  } catch (err) {
+    console.error(err.message);
+    return res.status(500).send('Internal Server Error!');
+  }
+};
 
 export const editGroupInfo = async (req, res) => {
   const { groupId } = req.params;

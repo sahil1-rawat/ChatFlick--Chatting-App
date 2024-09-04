@@ -44,8 +44,24 @@ export const SocketProvider = ({ children }) => {
       const handleMultipleUserStatusChange = (statuses) => {
         setOnlineStatuses(statuses);
       };
+      const handleReceiveGroupMessage = (message) => {
+        const {
+          selectedChatData,
+          selectedChatType,
+          addMessage,
+          addGroupInGroupList,
+        } = useAppStore.getState();
+        if (
+          selectedChatType !== undefined &&
+          selectedChatData._id === message.groupId
+        ) {
+          addMessage(message);
+        }
+        addGroupInGroupList(message);
+      };
 
       socket.current.on('receiveMessage', handleReceiveMessage);
+      socket.current.on('receive-group-message', handleReceiveGroupMessage);
       socket.current.on('senderMessage', handleReceiveMessage);
       socket.current.on('userStatusChange', handleUserStatusChange);
       socket.current.on(

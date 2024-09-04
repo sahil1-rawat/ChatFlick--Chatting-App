@@ -67,6 +67,7 @@ const ChatHeader = () => {
       setDropdownOpen(false);
     }
   };
+
   const [isEditingGroup, setIsEditingGroup] = useState(false);
   const [name, setName] = useState(selectedChatData.name || '');
   const [description, setDescription] = useState(
